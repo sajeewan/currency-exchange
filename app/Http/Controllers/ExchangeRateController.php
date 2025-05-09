@@ -85,7 +85,6 @@ class ExchangeRateController extends Controller
         try {
             $request->validate([
                 'base_currency' => 'required|string|size:3',
-                'target_currency' => 'nullable|string|size:3',
                 'rate' => 'required|numeric|min:0',
                 'date' => 'required|date',
             ]);
@@ -97,7 +96,6 @@ class ExchangeRateController extends Controller
                 ],
                 [
                     'rate' => $request->rate,
-                    'target_currency' => $request->target_currency,
                 ]
             );
 
@@ -105,7 +103,7 @@ class ExchangeRateController extends Controller
                 'user_id' => auth()->id(),
                 'action' => 'store',
                 'resource' => 'exchange_rate',
-                'details' => "Stored rate for {$request->base_currency}/" . ($request->target_currency ?? 'N/A') . " on {$request->date}",
+                'details' => "Stored rate for {$request->base_currency}/" . " on {$request->date}",
             ]);
 
             return response()->json($exchangeRate, 201);
@@ -154,17 +152,7 @@ class ExchangeRateController extends Controller
 
             $exchangeRate = ExchangeRate::findOrFail($id);
 
-            $existingRate = ExchangeRate::where('base_currency', $request->base_currency)
-                ->where('date', $request->date)
-                ->where('id', '!=', $id)
-                ->first();
-
-            if ($existingRate) {
-                return response()->json([
-                    'message' => 'An exchange rate for this currency pair and date already exists.',
-                    'existing_rate' => $existingRate,
-                ], 422);
-            }
+            
 
             $exchangeRate->update([
                 'base_currency' => $request->base_currency,

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->decimal('rate', 10, 4);
             $table->date('date');
             $table->timestamps();
-            $table->unique(['base_currency', 'rate', 'date']);
+            $table->unique(['base_currency', 'date']);
         });
     }
 
